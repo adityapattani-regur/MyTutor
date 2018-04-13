@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "823097602419",
+    "firebase_url": "https://mytutorapp-e1480.firebaseio.com",
+    "project_id": "mytutorapp-e1480",
+    "storage_bucket": "mytutorapp-e1480.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:823097602419:android:30dfa7cc3b3f323a",
+        "android_client_info": {
+          "package_name": "com.storytellers.tutor.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "823097602419-nroe73kjoq948v30ofc6g9ja5tdemo83.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.storytellers.tutor.app",
+            "certificate_hash": "b4cb10ae4d27c2096a995fcd2cbc7c3cded92ce8"
+          }
+        },
+        {
+          "client_id": "823097602419-ir44qa7du560k2v53fs0gdmjiopb6d12.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChZOPZaWoYpRF2I05FIx-krXkd0BnLlu8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "823097602419-ir44qa7du560k2v53fs0gdmjiopb6d12.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
