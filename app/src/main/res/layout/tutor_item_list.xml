@@ -29,6 +29,7 @@
         android:fontFamily="@font/comfortaa"
         android:textColor="@android:color/white"
         android:ellipsize="end"
+        android:maxLines="1"
         android:textStyle="bold"
         android:textSize="16sp"
         tools:text="Umang Jasani" />
@@ -42,6 +43,7 @@
         android:fontFamily="@font/comfortaa"
         android:layout_below="@id/tutor_name"
         android:ellipsize="end"
+        android:maxLines="1"
         android:textSize="14sp"
         tools:text="Knows about Life, FIFA" />
 

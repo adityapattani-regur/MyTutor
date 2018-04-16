@@ -7,6 +7,7 @@
     android:background="@color/colorPrimary">
 
     <TextView
+        android:id="@+id/text_learn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/comfortaa"
@@ -39,7 +40,9 @@
         android:id="@+id/tutors_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="48dp"/>
+        app:layout_constraintTop_toBottomOf="@id/text_learn"
+        android:layout_marginTop="16dp"
+        android:paddingBottom="56dp"
+        android:fitsSystemWindows="true" />
 
 </android.support.constraint.ConstraintLayout>
