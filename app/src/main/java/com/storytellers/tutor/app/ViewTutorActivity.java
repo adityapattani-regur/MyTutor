@@ -1,18 +1,26 @@
 package com.storytellers.tutor.app;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -36,17 +44,24 @@ public class ViewTutorActivity extends AppCompatActivity implements ReviewAdapte
     ImageView tutorImage;
     Tutor tutor;
 
+    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
     FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference databaseReference = database.getReference("reviews");
+    DatabaseReference reviewsReference = database.getReference("reviews");
+    DatabaseReference reportReference = database.getReference("reports");
 
     SharedPreferences sharedPreferences;
 
     String username;
+    String reporter;
+    boolean alreadyReported = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_tutor);
+
+        reporter = mAuth.getCurrentUser().getUid();
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -96,7 +111,7 @@ public class ViewTutorActivity extends AppCompatActivity implements ReviewAdapte
         String recoms = tutor.getRecommendations() + " users";
         tutorRecoms.setText(recoms);
 
-        if (tutor.getKnows() == null || tutor.getKnows().length() == 0){
+        if (tutor.getKnows() == null || tutor.getKnows().length() == 0) {
             List<String> knows = new ArrayList<>();
             knows.add("No data added");
             KnowsAdapter knowsAdapter = new KnowsAdapter(getApplicationContext(), knows);
@@ -111,7 +126,7 @@ public class ViewTutorActivity extends AppCompatActivity implements ReviewAdapte
         final ReviewAdapter reviewAdapter = new ReviewAdapter(getApplicationContext(), reviews, this);
         userReviews.setAdapter(reviewAdapter);
 
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        reviewsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 reviews.clear();
@@ -134,7 +149,8 @@ public class ViewTutorActivity extends AppCompatActivity implements ReviewAdapte
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {}
+            public void onCancelled(DatabaseError databaseError) {
+            }
         });
 
         contactButton = findViewById(R.id.contact_button);
@@ -143,13 +159,15 @@ public class ViewTutorActivity extends AppCompatActivity implements ReviewAdapte
             public void onClick(View v) {
                 Intent sendEmail = new Intent(Intent.ACTION_SENDTO);
                 sendEmail.setData(Uri.parse("mailto:"));
-                sendEmail.putExtra(Intent.EXTRA_EMAIL, new String[] { tutor.getEmail() });
+                sendEmail.putExtra(Intent.EXTRA_EMAIL, new String[]{tutor.getEmail()});
                 sendEmail.putExtra(Intent.EXTRA_SUBJECT, "TutorApp - Question by " + username);
                 sendEmail.putExtra(Intent.EXTRA_TEXT, "Write your questions here");
 
                 startActivity(Intent.createChooser(sendEmail, "Send an Email"));
             }
         });
+
+        checkIfAlreadyReported();
 
         addReviewBtn = findViewById(R.id.add_review_button);
         addReviewBtn.setOnClickListener(new View.OnClickListener() {
@@ -159,6 +177,18 @@ public class ViewTutorActivity extends AppCompatActivity implements ReviewAdapte
                 intent.putExtra("tutor", tutor);
                 startActivity(intent);
             }
+        });
+    }
+
+    private void checkIfAlreadyReported() {
+        reportReference.child(tutor.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                alreadyReported = dataSnapshot.child(reporter).getValue(Integer.class) != null;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
         });
     }
 
@@ -173,5 +203,46 @@ public class ViewTutorActivity extends AppCompatActivity implements ReviewAdapte
     protected void onStop() {
         super.onStop();
         finish();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.report_user_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.id_report_user) {
+            if (!alreadyReported) {
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(ViewTutorActivity.this);
+                AlertDialog confirmDialog = alertDialog.setTitle(Html.fromHtml("<font color='#000000'>Report user</font>"))
+                        .setMessage("Would you like to report this user for Obscene content?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                reportReference.child(tutor.getId()).child(reporter).setValue(1);
+                                alreadyReported = true;
+                                Toast.makeText(getApplicationContext(), "Report submitted", Toast.LENGTH_LONG).show();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).create();
+                confirmDialog.show();
+                Button buttonPositive = confirmDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+                buttonPositive.setTextColor(ContextCompat.getColor(this, R.color.colorGreen));
+                Button buttonNegative = confirmDialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+                buttonNegative.setTextColor(ContextCompat.getColor(this, R.color.colorRed));
+            } else {
+                Toast.makeText(getApplicationContext(), "You've already reported this user", Toast.LENGTH_LONG).show();
+            }
+
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

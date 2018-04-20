@@ -55,4 +55,6 @@
     <string name="the_human_library">The \nHuman Library</string>
     <string name="background">Background</string>
     <string name="edit">edit</string>
+    <string name="report_user">Report User</string>
+    <string name="deactivate_account">Deactivate Account</string>
 </resources>

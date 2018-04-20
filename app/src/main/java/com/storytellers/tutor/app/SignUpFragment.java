@@ -69,20 +69,24 @@ public class SignUpFragment extends Fragment {
                 String password_str = password.getEditText().getText().toString().trim();
                 String confPassword_str = confPassword.getEditText().getText().toString().trim();
 
-                if(CheckerUtils.isEmailValid(email_str)){
-                    if (password_str.equals(confPassword_str)){
-                        if (!username_str.isEmpty()) {
-                            progressBar.setVisibility(View.VISIBLE);
-                            signUserUp(username_str, email_str, password_str);
+                if(!email_str.contains("@nirmauni.ac.in")){
+                    email.setError("You should use your Nirma Account");
+                } else {
+                    if (CheckerUtils.isEmailValid(email_str)) {
+                        if (password_str.equals(confPassword_str)) {
+                            if (!username_str.isEmpty()) {
+                                progressBar.setVisibility(View.VISIBLE);
+                                signUserUp(username_str, email_str, password_str);
+                            } else {
+                                username.setError("Username cannot be null");
+                            }
                         } else {
-                            username.setError("Username cannot be null");
+                            password.setError("Please check if both the passwords match");
+                            confPassword.setError("Please check if both the passwords match");
                         }
                     } else {
-                        password.setError("Please check if both the passwords match");
-                        confPassword.setError("Please check if both the passwords match");
+                        email.setError("Not a valid email");
                     }
-                } else {
-                    email.setError("Not a valid email");
                 }
             }
         });
